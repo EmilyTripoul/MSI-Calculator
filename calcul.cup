@@ -4,14 +4,24 @@ import java_cup.runtime.*;
 import java.util.*;
 import java.io.*;
 
+  
+
 parser code {:
   public static void main(String args[]) throws Exception {
-    new Parser(new Lexer(new InputStreamReader(System.in))).parse();
+    if(args.length==0) {
+      new Parser(new Lexer(new InputStreamReader(System.in))).parse();
+    } else {
+      new Parser(new Lexer(new StringReader(args[0]))).parse();
+    }
   }
+  public Map<String, Double> map;
+
 :}
 
 // definition des token
-terminal TK_PLUS, TK_DONE;
+terminal OP_PLUS, OP_MINUS, OP_MULT, OP_DIVIDE, OP_ASSIGN, OP_EQ, OP_NEQ, OP_GREATER, OP_SMALLER;
+terminal TK_PAR_OPEN, TK_PAR_CLOSE, TK_IDENT;
+terminal TK_DONE;
 terminal Double TK_VAL; 
 
 // definition des etats intermediaires
@@ -19,7 +29,8 @@ non terminal commandes, commande;
 non terminal Double expression;
 
 // associativite et priorite des operateurs
-precedence left TK_PLUS;
+precedence left OP_PLUS, OP_MINUS;
+precedence left OP_MULT, OP_DIVIDE;
 
 // objectif
 start with commandes;
@@ -36,8 +47,18 @@ commande ::=
 ;
 
 expression ::=
-    expression:e1 TK_PLUS expression:e2 // effectue l'addition
-	{: RESULT = e1 + e2 ; :}
-  | TK_VAL:v // valeur
-	{: RESULT = v; :}
+  TK_PAR_OPEN expression:e1 TK_PAR_CLOSE {: RESULT = e1 ; :}
+  | TK_IDENT:v {: RESULT=map.get(v); :}
+  | TK_IDENT:v TK_PAR_OPEN expression:e1 TK_PAR_CLOSE {: 
+  Double value=e1; 
+  if(v.equals("sin")) {value = Math.sin(e1); } 
+  else if (v.equals("cos")) {value = Math.cos(e1); } 
+  RESULT = value; :}
+  | expression:e1 OP_PLUS expression:e2 {: RESULT = e1 + e2 ; :}
+  | expression:e1 OP_MINUS expression:e2 {: RESULT = e1 - e2 ; :}
+  | expression:e1 OP_MULT expression:e2 {: RESULT = e1 * e2 ; :}
+  | expression:e1 OP_DIVIDE expression:e2 {: RESULT = e1 / e2 ; :}
+  | OP_PLUS expression:e1 {: RESULT = + e1 ; :}
+  | OP_MINUS expression:e1 {: RESULT = - e1 ; :}
+  | TK_VAL:v 	{: RESULT = v; :}
 ;

@@ -17,10 +17,27 @@ import java.io.*;
   }
 %}
 %%
-[0-9]+	{ return new Symbol(sym.TK_VAL, new Double(yytext())); }
-"+"	{ return new Symbol(sym.TK_PLUS); }
-(\n|\r|\r\n)	{ return new Symbol(sym.TK_DONE); }
-[\ \t\f] { /* ignore espaces et assimiles. */ }
+[0-9]+\.?[0-9]*E?[-]?[0-9]*	{ return new Symbol(sym.TK_VAL, new Double(yytext())); }
+"+"	{ return new Symbol(sym.OP_PLUS); }
+"-"	{ return new Symbol(sym.OP_MINUS); }
+"*"	{ return new Symbol(sym.OP_MULT); }
+"/"	{ return new Symbol(sym.OP_DIVIDE); }
+"="	{ return new Symbol(sym.OP_ASSIGN); }
+"=="	{ return new Symbol(sym.OP_EQ); }
+"!="	{ return new Symbol(sym.OP_NEQ); }
+">"	{ return new Symbol(sym.OP_GREATER); }
+"<"	{ return new Symbol(sym.OP_SMALLER); }
+"("	{ return new Symbol(sym.TK_PAR_OPEN); }
+")"	{ return new Symbol(sym.TK_PAR_CLOSE); }
+"true"	{ return new Symbol(sym.TK_VAL, new Double(1)); }
+"false"	{ return new Symbol(sym.TK_VAL, new Double(0)); }
+[a-zA-Z][a-zA-Z0-9]* { return new Symbol(sym.TK_IDENT, new String(yytext())); }
+(\n|\r|\r\n|;)	{ return new Symbol(sym.TK_DONE); }
+[\ \t\f] {  }
 .	{ System.err.println("unexpected char '" + yytext() +
 			     "' line " + yyline);
-	  return new Symbol(sym.error); }
+    return new Symbol(sym.error);
+  }
+    
+
+    

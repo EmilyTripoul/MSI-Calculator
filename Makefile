@@ -16,5 +16,8 @@ compile:
 run: compile
 	$(JAVA) $(JFLAGS) Parser
 
+test: compile
+	python test.py
+
 clean:
 	$(RM) Lexer.java Parser.java sym.java *~ *.class
